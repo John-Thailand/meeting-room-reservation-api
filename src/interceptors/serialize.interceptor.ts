@@ -1,5 +1,7 @@
 import { CallHandler, ExecutionContext, NestInterceptor } from "@nestjs/common";
+import { plainToClass } from "class-transformer";
 import { map, Observable } from "rxjs";
+import { UserDto } from "src/users/dtos/user.dto";
 
 // Observable 複数の非同期データを扱えるストリーム型
 // next.handle()はObservableを返す。これに.pipe()を使用して処理の前後に割り込むことができる。
@@ -13,6 +15,13 @@ export class SerializeInterceptor implements NestInterceptor {
       map((data: any) => {
         // Run something before the response is sent out
         console.log('Im running before response is sent out', data)
+
+        // data: JSオブジェクト
+        // オブジェクトからUserDtoクラスのインスタンスに変換
+        // excludeExtraneousValues: true → @Expose()がついたプロパティだけを変換対象とする
+        return plainToClass(UserDto, data, {
+          excludeExtraneousValues: true,
+        })
       })
     )
   }
