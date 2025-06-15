@@ -1,6 +1,10 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from "@nestjs/common";
+import { CallHandler, ExecutionContext, NestInterceptor, UseInterceptors } from "@nestjs/common";
 import { plainToClass } from "class-transformer";
 import { map, Observable } from "rxjs";
+
+export function Serialize(dto: any) {
+  return UseInterceptors(new SerializeInterceptor(dto))
+}
 
 // Observable 複数の非同期データを扱えるストリーム型
 // next.handle()はObservableを返す。これに.pipe()を使用して処理の前後に割り込むことができる。
