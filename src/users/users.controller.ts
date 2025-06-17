@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, Session } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -13,6 +13,20 @@ export class UsersController {
     private usersService: UsersService,
     private authService: AuthService
   ) {}
+
+  @Get('/colors/:color')
+  setColor(@Param('color') color: string, @Session() session: any) {
+    // リクエストとレスポンス間のsessionオブジェクトにcolorプロパティを追加
+    // そのセッション全体をJSON化・エンコード・署名・クッキーとしてレスポンスヘッダに送信している
+    // Set-Cookie: session=eyJjb2xvciI6ImJsdWUifQ==; Path=/; HttpOnly
+    // クッキーの名前はsessionという１つのキーの中にまとめて格納される
+    session.color = color
+  }
+
+  @Get('/colors')
+  getColor(@Session() session: any) {
+    return session.color
+  }
 
   @Post('/signup')
   createUser(@Body() body: CreateUserDto) {
