@@ -14,6 +14,11 @@ export class UsersController {
     private authService: AuthService
   ) {}
 
+  @Get('/whoami')
+  whoAmI(@Session() session: any) {
+    return this.usersService.findOne(session.userId)
+  }
+
   @Get('/colors/:color')
   setColor(@Param('color') color: string, @Session() session: any) {
     // リクエストとレスポンス間のsessionオブジェクトにcolorプロパティを追加
