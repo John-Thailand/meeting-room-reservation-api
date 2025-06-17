@@ -19,6 +19,11 @@ export class UsersController {
     return this.usersService.findOne(session.userId)
   }
 
+  @Post('/signout')
+  signOut(@Session() session: any) {
+    session.userId = null
+  }
+
   @Get('/colors/:color')
   setColor(@Param('color') color: string, @Session() session: any) {
     // リクエストとレスポンス間のsessionオブジェクトにcolorプロパティを追加

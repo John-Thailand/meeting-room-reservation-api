@@ -14,6 +14,10 @@ export class UsersService {
   }
 
   findOne(id: number) {
+    // idがnullだとfindOneByは最初の要素を返してしまう
+    if (!id) {
+      return null
+    }
     return this.repo.findOneBy({ id })
   }
 
