@@ -9,7 +9,6 @@ export const CurrentUser = createParamDecorator(
     // そのため、デコレータはユーザーサービスのインスタンスを取得できません
     // なのでインターセプターでユーザーサービスからユーザー情報を取得し、デコレータに返すようにする
     const request = context.switchToHttp().getRequest()
-    console.log(request.session.userId)
-    return 'hi there!'
+    return request.currentUser
   },
 )
