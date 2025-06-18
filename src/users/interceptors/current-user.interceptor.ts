@@ -8,7 +8,8 @@ export class CurrentUserInterceptor implements NestInterceptor {
 
   async intercept(context: ExecutionContext, handler: CallHandler) {
     const request = context.switchToHttp().getRequest()
-    const { userId } = request.session
+    // request.session が null や undefinedの時はからのオブジェクトを代わりに代入する
+    const { userId } = request.session || {}
 
     if (userId) {
       const user = await this.usersService.findOne(userId)
