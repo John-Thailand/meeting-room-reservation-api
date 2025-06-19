@@ -8,6 +8,7 @@ export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
   create(email: string, password: string, contractStartDate: Date) {
+    // TODO: UTC時間でcontract_start_dateを登録する
     const user = this.repo.create({
       email,
       password,
