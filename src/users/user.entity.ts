@@ -2,8 +2,8 @@ import { AfterInsert, AfterRemove, AfterUpdate, Column, Entity, PrimaryGenerated
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   // ユニーク制約で同じメールアドレスを登録できないようにする
   @Column({ unique: true })
