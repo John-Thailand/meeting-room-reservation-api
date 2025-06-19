@@ -11,6 +11,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column()
+  contract_start_date: Date;
+
   @AfterInsert()
   logInsert() {
     console.log('Inserted User with id', this.id)

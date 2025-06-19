@@ -43,10 +43,10 @@ export class UsersController {
     return session.color
   }
 
+  // TODO: 管理者しか実行することができない
   @Post('/signup')
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
-    const user = await this.authService.signup(body.email, body.password)
-    session.userId = user.id
+    const user = await this.authService.signup(body)
     return user
   }
 
