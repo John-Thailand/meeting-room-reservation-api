@@ -5,14 +5,21 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  // ユニーク制約で同じメールアドレスを登録できないようにする
+  @Column({ unique: true })
   email: string;
 
   @Column()
   password: string;
 
+  @Column({ type: 'boolean', default: false })
+  is_administrator: boolean;
+
   @Column()
   contract_start_date: Date;
+
+  @Column({ type: 'datetime', nullable: true, default: null })
+  withdrawal_date: Date;
 
   // datetime型：日付 + 時刻（2025-06-20 12:34:56）
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
