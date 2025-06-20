@@ -12,6 +12,23 @@ export class AuthGuard implements CanActivate {
 
     const user = await this.usersService.findOne(userId)
 
-    return !!user
+    // ユーザーが存在しない場合は、エンドポイントへのアクセスを許可しない
+    if (!user) {
+      return false
+    }
+
+    // 管理者の場合は、必ずエンドポイントへのアクセスを許可する
+    if (user.is_administrator) {
+      return true
+    }
+
+    // 一般ユーザーの場合は、契約期間中はエンドポイントへのアクセスを許可する
+    const today = new Date()
+    const contractStartDate = new Date(user.contract_start_date)
+    const withdrawalDate = user.withdrawal_date ? new Date(user.withdrawal_date) : null
+
+    const isContractPeriod =
+      contractStartDate <= today && (!withdrawalDate || today <= withdrawalDate)
+    return isContractPeriod
   }
 }
