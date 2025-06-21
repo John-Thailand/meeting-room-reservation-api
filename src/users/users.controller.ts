@@ -26,11 +26,6 @@ export class UsersController {
     return user
   }
 
-  @Post('/signout')
-  signOut(@Session() session: any) {
-    session.userId = null
-  }
-
   @Get('/colors/:color')
   setColor(@Param('color') color: string, @Session() session: any) {
     // リクエストとレスポンス間のsessionオブジェクトにcolorプロパティを追加
@@ -59,6 +54,17 @@ export class UsersController {
     return user
   }
 
+  @Post('/signout')
+  signOut(@Session() session: any) {
+    session.userId = null
+  }
+
+  @Patch('/:id')
+  @UseGuards(AdminGuard)
+  updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
+    return this.usersService.update(id, body)
+  }
+
   // @UseInterceptors(new SerializeInterceptor(UserDto))
   @Get('/:id')
   async findUser(@Param('id') id: string) {
@@ -78,10 +84,5 @@ export class UsersController {
   @Delete('/:id')
   removeUser(@Param('id') id: string) {
     return this.usersService.remove(id)
-  }
-
-  @Patch('/:id')
-  updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
-    return this.usersService.update(id, body)
   }
 }

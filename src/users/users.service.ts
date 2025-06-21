@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -35,6 +35,23 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('user not found')
     }
+
+    const contractStartDate = attrs.contract_start_date
+    const withdrawalDate = attrs.withdrawal_date
+    if (contractStartDate && withdrawalDate) {
+      if (contractStartDate >= withdrawalDate) {
+        throw new BadRequestException('the withdrawal date must be later than the contract start date')
+      }
+    } else if (contractStartDate) {
+      if (user.withdrawal_date != null && contractStartDate >= user.withdrawal_date) {
+        throw new BadRequestException('the withdrawal date must be later than the contract start date')
+      }
+    } else if (withdrawalDate) {
+      if (user.contract_start_date >= withdrawalDate) {
+        throw new BadRequestException('the withdrawal date must be later than the contract start date')
+      }
+    }
+
     Object.assign(user, attrs)
     return this.repo.save(user)
   }
