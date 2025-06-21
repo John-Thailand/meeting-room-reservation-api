@@ -66,6 +66,22 @@ export class UsersService {
     return this.repo.save(user)
   }
 
+  async withdraw(id: string, withdrawal_date: Date) {
+    // 対象のユーザーが存在しない場合はエラーを返す
+    const user = await this.findOne(id)
+    if (!user) {
+      throw new NotFoundException('user not found')
+    }
+
+    // 解約日は契約開始日の後でないとエラーを返す
+    if (user.contract_start_date >= withdrawal_date) {
+      throw new BadRequestException('the withdrawal date must be later than the contract start date')
+    }
+
+    user.withdrawal_date = withdrawal_date
+    return this.repo.save(user)
+  }
+
   async remove(id: string) {
     const user = await this.findOne(id)
     if (!user) {

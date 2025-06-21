@@ -10,6 +10,7 @@ import { User } from './user.entity';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { SigninUserDto } from './dtos/signin-user.dto';
+import { WithdrawUserDto } from './dtos/withdraw-user.dto';
 
 @Controller('auth')
 @Serialize(UserDto)
@@ -63,6 +64,12 @@ export class UsersController {
   @UseGuards(AdminGuard)
   updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.usersService.update(id, body)
+  }
+
+  @Patch('/:id/withdraw')
+  @UseGuards(AdminGuard)
+  withdrawUser(@Param('id') id: string, @Body() body: WithdrawUserDto) {
+    return this.usersService.withdraw(id, body.withdrawal_date)
   }
 
   // @UseInterceptors(new SerializeInterceptor(UserDto))
