@@ -14,6 +14,8 @@ async function bootstrap() {
   }))
   app.useGlobalPipes(
     new ValidationPipe({
+      // DTOでデフォルト値を設定する（order = 'desc'）場合に必要
+      transform: true,
       whitelist: true,
     }),
   );
