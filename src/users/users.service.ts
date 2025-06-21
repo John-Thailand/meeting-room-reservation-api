@@ -31,11 +31,21 @@ export class UsersService {
   }
 
   async update(id: string, attrs: Partial<User>) {
+    // 更新対象のユーザーが存在しない場合はエラーを返す
     const user = await this.findOne(id)
     if (!user) {
       throw new NotFoundException('user not found')
     }
 
+    // 更新後のメールアドレスを既に使っているユーザーが存在する場合はエラーを返す
+    if (attrs.email && attrs.email !== user.email) {
+      const users = await this.find(attrs.email)
+      if (users.length > 0) {
+        throw new BadRequestException('email in use')
+      }
+    }
+
+    // 解約日は契約開始日の後でないとエラーを返す
     const contractStartDate = attrs.contract_start_date
     const withdrawalDate = attrs.withdrawal_date
     if (contractStartDate && withdrawalDate) {
