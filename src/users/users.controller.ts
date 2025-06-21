@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { AdminGuard } from 'src/guards/admin.guard';
 
 @Controller('auth')
 @Serialize(UserDto)
@@ -43,8 +44,8 @@ export class UsersController {
     return session.color
   }
 
-  // TODO: 管理者しか実行することができない
   @Post('/signup')
+  @UseGuards(AdminGuard)
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
     const user = await this.authService.signup(body)
     return user
