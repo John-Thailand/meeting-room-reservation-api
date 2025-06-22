@@ -23,12 +23,6 @@ export class UsersController {
     private authService: AuthService
   ) {}
 
-  @Get('/whoami')
-  @UseGuards(AuthGuard)
-  whoAmI(@CurrentUser() user: User): User {
-    return user
-  }
-
   @Post('/signup')
   @UseGuards(AdminGuard)
   async createUser(@Body() body: CreateUserDto, @Session() session: any): Promise<User> {
@@ -70,6 +64,12 @@ export class UsersController {
     return this.usersService.search(query)
   }
 
+  @Get('/me')
+  @UseGuards(AuthGuard)
+  getMe(@CurrentUser() user: User): User {
+    return user
+  }
+
   // @UseInterceptors(new SerializeInterceptor(UserDto))
   @Get('/:id')
   async findUser(@Param('id') id: string): Promise<User> {
@@ -84,10 +84,5 @@ export class UsersController {
   @Get()
   findAllUsers(@Query('email') email: string): Promise<User[]> {
     return this.usersService.find(email)
-  }
-
-  @Delete('/:id')
-  removeUser(@Param('id') id: string): Promise<User> {
-    return this.usersService.remove(id)
   }
 }
