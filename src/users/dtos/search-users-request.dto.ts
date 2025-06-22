@@ -1,7 +1,7 @@
 import { Transform, Type } from "class-transformer";
 import { IsBoolean, IsDate, IsIn, IsInt, IsOptional, IsString } from "class-validator";
 
-export class SearchUsersDto {
+export class SearchUsersRequestDto {
   @IsString()
   @IsOptional()
   email: string;

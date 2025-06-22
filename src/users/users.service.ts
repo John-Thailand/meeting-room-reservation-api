@@ -2,7 +2,8 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SearchUsersDto } from './dtos/search-users.dto';
+import { SearchUsersRequestDto } from './dtos/search-users-request.dto';
+import { SearchUsersResponseDto } from './dtos/search-users-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -83,7 +84,7 @@ export class UsersService {
     return this.repo.save(user)
   }
 
-  async search(dto: SearchUsersDto) {
+  async search(dto: SearchUsersRequestDto): Promise<SearchUsersResponseDto> {
     let query =  this.repo.createQueryBuilder()
 
     if (dto.email) {
@@ -130,13 +131,18 @@ export class UsersService {
     const order = dto.order.toUpperCase() as 'ASC' | 'DESC'
     query = query.orderBy(dto.order_by, order)
 
+    const allCount = await query.getCount()
+
     query = query
       .limit(dto.page_size)
       .offset(dto.page * dto.page_size)
 
     const users = await query.getMany()
 
-    return users
+    return {
+      users,
+      total: allCount,
+    }
   }
 
   async remove(id: string) {

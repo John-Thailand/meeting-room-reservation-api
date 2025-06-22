@@ -11,10 +11,11 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { SigninUserDto } from './dtos/signin-user.dto';
 import { WithdrawUserDto } from './dtos/withdraw-user.dto';
-import { SearchUsersDto } from './dtos/search-users.dto';
+import { SearchUsersRequestDto } from './dtos/search-users-request.dto';
+import { SearchUsersResponseDto } from './dtos/search-users-response.dto';
 
 @Controller('auth')
-@Serialize(UserDto)
+// @Serialize(UserDto)
 // @UseInterceptors(CurrentUserInterceptor)
 export class UsersController {
   constructor(
@@ -76,9 +77,10 @@ export class UsersController {
   // 検索はデータを見るだけであり副作用がない操作なので、GETにすべき
   @Get('/search')
   @UseGuards(AdminGuard)
+  @Serialize(SearchUsersResponseDto)
   // /users/search?email=aaa@gmail.com&order_by=created_at のように RESTでは状態の取得に必要な条件をURLで表現すべきという考え
   // 同じURLを再度アクセスすることで同じ検索結果を得られる
-  searchUsers(@Query() query: SearchUsersDto) {
+  searchUsers(@Query() query: SearchUsersRequestDto): Promise<SearchUsersResponseDto> {
     return this.usersService.search(query)
   }
 
