@@ -84,6 +84,30 @@ export class UsersService {
     return this.repo.save(user)
   }
 
+  async updateEmail(id: string, email: string): Promise<User> {
+    // 更新対象のユーザーが存在しない場合はエラーを返す
+    const user = await this.findOne(id)
+    if (!user) {
+      throw new NotFoundException('user not found')
+    }
+
+    // 更新後のメールアドレスを既に使っているユーザーが存在する場合はエラーを返す
+    if (email && email !== user.email) {
+      const users = await this.find(email)
+      if (users.length > 0) {
+        throw new BadRequestException('email in use')
+      }
+    }
+
+    // 現在と同じメールアドレスに変更しようとした場合もエラーを返す
+    if (email === user.email) {
+      throw new BadRequestException('your current email address and new email address are the same')
+    }
+
+    user.email = email
+    return this.repo.save(user)
+  }
+
   async search(dto: SearchUsersRequestDto): Promise<SearchUsersResponseDto> {
     let query =  this.repo.createQueryBuilder()
 

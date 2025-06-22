@@ -13,6 +13,7 @@ import { SigninUserDto } from './dtos/signin-user.dto';
 import { WithdrawUserDto } from './dtos/withdraw-user.dto';
 import { SearchUsersRequestDto } from './dtos/search-users-request.dto';
 import { SearchUsersResponseDto } from './dtos/search-users-response.dto';
+import { UpdateEmailDto } from './dtos/update-email.dto';
 
 @Controller('auth')
 // @Serialize(UserDto)
@@ -52,6 +53,13 @@ export class UsersController {
   @UseGuards(AdminGuard)
   withdrawUser(@Param('id') id: string, @Body() body: WithdrawUserDto): Promise<User> {
     return this.usersService.withdraw(id, body.withdrawal_date)
+  }
+
+  @Patch('/me/email')
+  @UseGuards(AuthGuard)
+  updateEmail(@Body() body: UpdateEmailDto, @Session() session: any): Promise<User> {
+    const userId = session.userId as string
+    return this.usersService.updateEmail(userId, body.email)
   }
 
   // 検索はデータを見るだけであり副作用がない操作なので、GETにすべき
