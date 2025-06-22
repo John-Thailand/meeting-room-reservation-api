@@ -1,4 +1,19 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { CoworkingSpacesService } from './coworking-spaces.service';
+import { AdminGuard } from 'src/guards/admin.guard';
+import { CreateCoworkingSpaceDto } from './dtos/create-coworking-space.dto';
+import { CoworkingSpace } from './coworking-space.entity';
 
 @Controller('coworking-spaces')
-export class CoworkingSpacesController {}
+export class CoworkingSpacesController {
+  constructor(
+    private coworkingSpacesService: CoworkingSpacesService
+  ) {}
+
+  @Post()
+  @UseGuards(AdminGuard)
+  async createCoworkingSpace(@Body() body: CreateCoworkingSpaceDto): Promise<CoworkingSpace> {
+    const coworkingSpace = await this.coworkingSpacesService.create(body)
+    return coworkingSpace
+  }
+}
