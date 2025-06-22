@@ -4,6 +4,11 @@ import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SearchUsersRequestDto } from './dtos/search-users-request.dto';
 import { SearchUsersResponseDto } from './dtos/search-users-response.dto';
+import { UpdatePasswordDto } from './dtos/update-password.dto';
+import { randomBytes, scrypt as _scrypt } from 'crypto';
+import { promisify } from 'util';
+
+const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class UsersService {
@@ -105,6 +110,46 @@ export class UsersService {
     }
 
     user.email = email
+    return this.repo.save(user)
+  }
+
+  async updatePassword(id: string, dto: UpdatePasswordDto): Promise<User> {
+    // 更新対象のユーザーが存在しない場合はエラーを返す
+    const user = await this.findOne(id)
+    if (!user) {
+      throw new NotFoundException('user not found')
+    }
+
+    // 新しいパスワードと新しい確認用パスワードが一致していない場合はエラーを返す
+    if (dto.password !== dto.password_confirmation) {
+      throw new BadRequestException('new password and new confirmation password do not match')
+    }
+
+    const [storedSalt, storedHash] = user.password.split('.')
+
+    const currentPasswordHash = (await scrypt(dto.current_password, storedSalt, 32)) as Buffer
+
+    // 入力された現在のパスワードが間違っている場合にエラーを返す
+    if (storedHash !== currentPasswordHash.toString('hex')) {
+      throw new BadRequestException('bad password')
+    }
+
+    // 現在のパスワードと新しいパスワードが同じ場合もエラーを返す
+    if (dto.current_password === dto.password) {
+      throw new BadRequestException('current password and new password are the same')
+    }
+
+    // パスワードを暗号化
+    const newPasswordSalt = randomBytes(8).toString('hex')
+    const newPasswordHash = (await scrypt(dto.password, newPasswordSalt, 32)) as Buffer
+    const result = newPasswordSalt + '.' + newPasswordHash.toString('hex')
+
+    // パスワードを変更
+    user.password = result
+
+    // TODO: 重大な操作（パスワード変更）は、監視や通知の観点でログを入れても良いかも
+    // TODO: またメールアドレス宛にパスワードが変更した旨を通知するのも良い
+
     return this.repo.save(user)
   }
 
