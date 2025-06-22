@@ -9,7 +9,7 @@ import { SearchUsersResponseDto } from './dtos/search-users-response.dto';
 export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
-  create(email: string, password: string, contractStartDate: Date) {
+  create(email: string, password: string, contractStartDate: Date): Promise<User> {
     // TODO: UTC時間でcontract_start_dateを登録する
     const user = this.repo.create({
       email,
@@ -20,7 +20,7 @@ export class UsersService {
     return this.repo.save(user);
   }
 
-  findOne(id: string) {
+  findOne(id: string): Promise<User> {
     // idがnullだとfindOneByは最初の要素を返してしまう
     if (!id) {
       return null
@@ -28,11 +28,11 @@ export class UsersService {
     return this.repo.findOneBy({ id })
   }
 
-  find(email: string) {
+  find(email: string): Promise<User[]> {
     return this.repo.find({ where:  { email } })
   }
 
-  async update(id: string, attrs: Partial<User>) {
+  async update(id: string, attrs: Partial<User>): Promise<User> {
     // 更新対象のユーザーが存在しない場合はエラーを返す
     const user = await this.findOne(id)
     if (!user) {
@@ -68,7 +68,7 @@ export class UsersService {
     return this.repo.save(user)
   }
 
-  async withdraw(id: string, withdrawal_date: Date) {
+  async withdraw(id: string, withdrawal_date: Date): Promise<User> {
     // 対象のユーザーが存在しない場合はエラーを返す
     const user = await this.findOne(id)
     if (!user) {
@@ -145,7 +145,7 @@ export class UsersService {
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<User> {
     const user = await this.findOne(id)
     if (!user) {
       throw new NotFoundException('user not found')

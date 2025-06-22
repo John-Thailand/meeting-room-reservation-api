@@ -25,33 +25,19 @@ export class UsersController {
 
   @Get('/whoami')
   @UseGuards(AuthGuard)
-  whoAmI(@CurrentUser() user: User) {
+  whoAmI(@CurrentUser() user: User): User {
     return user
-  }
-
-  @Get('/colors/:color')
-  setColor(@Param('color') color: string, @Session() session: any) {
-    // リクエストとレスポンス間のsessionオブジェクトにcolorプロパティを追加
-    // そのセッション全体をJSON化・エンコード・署名・クッキーとしてレスポンスヘッダに送信している
-    // Set-Cookie: session=eyJjb2xvciI6ImJsdWUifQ==; Path=/; HttpOnly
-    // クッキーの名前はsessionという１つのキーの中にまとめて格納される
-    session.color = color
-  }
-
-  @Get('/colors')
-  getColor(@Session() session: any) {
-    return session.color
   }
 
   @Post('/signup')
   @UseGuards(AdminGuard)
-  async createUser(@Body() body: CreateUserDto, @Session() session: any) {
+  async createUser(@Body() body: CreateUserDto, @Session() session: any): Promise<User> {
     const user = await this.authService.signup(body)
     return user
   }
 
   @Post('/signin')
-  async signin(@Body() body: SigninUserDto, @Session() session: any) {
+  async signin(@Body() body: SigninUserDto, @Session() session: any): Promise<User> {
     const user = await this.authService.signin(body.email, body.password)
     session.userId = user.id
     return user
@@ -64,13 +50,13 @@ export class UsersController {
 
   @Patch('/:id')
   @UseGuards(AdminGuard)
-  updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
+  updateUser(@Param('id') id: string, @Body() body: UpdateUserDto): Promise<User> {
     return this.usersService.update(id, body)
   }
 
   @Patch('/:id/withdraw')
   @UseGuards(AdminGuard)
-  withdrawUser(@Param('id') id: string, @Body() body: WithdrawUserDto) {
+  withdrawUser(@Param('id') id: string, @Body() body: WithdrawUserDto): Promise<User> {
     return this.usersService.withdraw(id, body.withdrawal_date)
   }
 
@@ -86,7 +72,7 @@ export class UsersController {
 
   // @UseInterceptors(new SerializeInterceptor(UserDto))
   @Get('/:id')
-  async findUser(@Param('id') id: string) {
+  async findUser(@Param('id') id: string): Promise<User> {
     console.log('handler is running')
     const user = await this.usersService.findOne(id)
     if (!user) {
@@ -96,12 +82,12 @@ export class UsersController {
   }
 
   @Get()
-  findAllUsers(@Query('email') email: string) {
+  findAllUsers(@Query('email') email: string): Promise<User[]> {
     return this.usersService.find(email)
   }
 
   @Delete('/:id')
-  removeUser(@Param('id') id: string) {
+  removeUser(@Param('id') id: string): Promise<User> {
     return this.usersService.remove(id)
   }
 }
