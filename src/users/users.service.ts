@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { SearchUsersDto } from './dtos/search-users.dto';
 
 @Injectable()
 export class UsersService {
@@ -80,6 +81,62 @@ export class UsersService {
 
     user.withdrawal_date = withdrawal_date
     return this.repo.save(user)
+  }
+
+  async search(dto: SearchUsersDto) {
+    let query =  this.repo.createQueryBuilder()
+
+    if (dto.email) {
+      query = query.where('email LIKE :email', {
+        email: `%${dto.email}%`
+      })
+    }
+
+    if (dto.registered_from_date && dto.registered_to_date) {
+      query = query.andWhere('contract_start_date BETWEEN :registered_from_date AND :registered_to_date', {
+        registered_from_date: dto.registered_from_date,
+        registered_to_date: dto.registered_to_date
+      })
+    } else if (dto.registered_from_date) {
+      query = query.andWhere('contract_start_date >= :registered_from_date', {
+        registered_from_date: dto.registered_from_date
+      })
+    } else if (dto.registered_to_date) {
+      query = query.andWhere('contract_start_date <= :registered_to_date', {
+        registered_to_date: dto.registered_to_date
+      })
+    }
+
+    if (dto.withdrawal_from_date && dto.withdrawal_to_date) {
+      query = query.andWhere('withdrawal_date BETWEEN :withdrawal_from_date AND :withdrawal_to_date', {
+        withdrawal_from_date: dto.withdrawal_from_date,
+        withdrawal_to_date: dto.withdrawal_to_date
+      })
+    } else if (dto.withdrawal_from_date) {
+      query = query.andWhere('withdrawal_date >= :withdrawal_from_date', {
+        withdrawal_from_date: dto.withdrawal_from_date
+      })
+    } else if (dto.withdrawal_to_date) {
+      query = query.andWhere('withdrawal_date <= :withdrawal_to_date', {
+        withdrawal_to_date: dto.withdrawal_to_date
+      })
+    }
+
+    // ===(厳密等価演算子)で型まで一致しているか判定する
+    if (dto.include_administrators === false) {
+      query = query.andWhere('is_administrator = false')
+    }
+
+    const order = dto.order.toUpperCase() as 'ASC' | 'DESC'
+    query = query.orderBy(dto.order_by, order)
+
+    query = query
+      .limit(dto.page_size)
+      .offset(dto.page * dto.page_size)
+
+    const users = await query.getMany()
+
+    return users
   }
 
   async remove(id: string) {

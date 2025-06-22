@@ -11,6 +11,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { SigninUserDto } from './dtos/signin-user.dto';
 import { WithdrawUserDto } from './dtos/withdraw-user.dto';
+import { SearchUsersDto } from './dtos/search-users.dto';
 
 @Controller('auth')
 @Serialize(UserDto)
@@ -70,6 +71,15 @@ export class UsersController {
   @UseGuards(AdminGuard)
   withdrawUser(@Param('id') id: string, @Body() body: WithdrawUserDto) {
     return this.usersService.withdraw(id, body.withdrawal_date)
+  }
+
+  // 検索はデータを見るだけであり副作用がない操作なので、GETにすべき
+  @Get('/search')
+  @UseGuards(AdminGuard)
+  // /users/search?email=aaa@gmail.com&order_by=created_at のように RESTでは状態の取得に必要な条件をURLで表現すべきという考え
+  // 同じURLを再度アクセスすることで同じ検索結果を得られる
+  searchUsers(@Query() query: SearchUsersDto) {
+    return this.usersService.search(query)
   }
 
   // @UseInterceptors(new SerializeInterceptor(UserDto))
