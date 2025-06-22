@@ -5,6 +5,7 @@ import { AppService } from "./app.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./users/user.entity";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { CoworkingSpacesModule } from './coworking-spaces/coworking-spaces.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
       }
     }),
     UsersModule,
+    CoworkingSpacesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
