@@ -59,6 +59,10 @@ export class CoworkingSpacesService {
     await this.repo.save(coworkingSpace)
   }
 
+  find(): Promise<CoworkingSpace[]> {
+    return this.repo.find({ where:  { is_deleted: false } })
+  }
+
   findOne(id: string): Promise<CoworkingSpace> {
     // idがnullだとfindOneByは最初の要素を返してしまう
     if (!id) {
