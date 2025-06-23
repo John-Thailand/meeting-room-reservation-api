@@ -7,6 +7,7 @@ import { User } from "./users/user.entity";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CoworkingSpacesModule } from './coworking-spaces/coworking-spaces.module';
 import { CoworkingSpace } from "./coworking-spaces/coworking-space.entity";
+import { BusinessHolidaysModule } from './business-holidays/business-holidays.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { CoworkingSpace } from "./coworking-spaces/coworking-space.entity";
     }),
     UsersModule,
     CoworkingSpacesModule,
+    BusinessHolidaysModule,
   ],
   controllers: [AppController],
   providers: [AppService],
