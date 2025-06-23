@@ -6,6 +6,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./users/user.entity";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CoworkingSpacesModule } from './coworking-spaces/coworking-spaces.module';
+import { CoworkingSpace } from "./coworking-spaces/coworking-space.entity";
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { CoworkingSpacesModule } from './coworking-spaces/coworking-spaces.modul
         return {
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
-          entities: [User],
+          entities: [User, CoworkingSpace],
           synchronize: true,
         }
       }

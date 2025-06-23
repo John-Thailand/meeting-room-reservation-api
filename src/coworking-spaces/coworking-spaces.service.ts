@@ -9,8 +9,8 @@ export class CoworkingSpacesService {
   constructor(@InjectRepository(CoworkingSpace) private repo: Repository<CoworkingSpace>) {}
 
   create(dto: CreateCoworkingSpaceDto): Promise<CoworkingSpace> {
-    const openTime = new Date(`1970-01-01T${dto.open_time}`)
-    const closeTime = new Date(`1970-01-01T${dto.close_time}`)
+    const openTime = new Date(`1970-01-01T${dto.open_time}:00`)
+    const closeTime = new Date(`1970-01-01T${dto.close_time}:00`)
 
     if (openTime >= closeTime) {
       throw new BadRequestException('close time must be later than open time')

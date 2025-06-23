@@ -8,9 +8,11 @@ export class CoworkingSpace {
   @Column({ type: 'text' })
   name: string;
 
+  // TODO: MySQLの場合はtypeを'time'にしておく
   @Column({ type: 'text' })
   open_time: string;
 
+  // TODO: MySQLの場合はtypeを'time'にしておく
   @Column({ type: 'text' })
   close_time: string;
 
