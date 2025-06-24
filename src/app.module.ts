@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CoworkingSpacesModule } from './coworking-spaces/coworking-spaces.module';
 import { CoworkingSpace } from "./coworking-spaces/coworking-space.entity";
 import { BusinessHolidaysModule } from './business-holidays/business-holidays.module';
+import { BusinessHoliday } from "./business-holidays/business-holiday.entity";
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { BusinessHolidaysModule } from './business-holidays/business-holidays.mo
         return {
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
-          entities: [User, CoworkingSpace],
+          entities: [User, CoworkingSpace, BusinessHoliday],
           synchronize: true,
         }
       }
