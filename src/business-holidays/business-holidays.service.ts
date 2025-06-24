@@ -35,5 +35,15 @@ export class BusinessHolidaysService {
 
     return this.repo.save(businessHolidayEntity)
   }
-}
 
+  async delete(id: string): Promise<void> {
+    // 指定IDの休業日が存在しない場合、エラーを返す
+    const businessHoliday = await this.repo.findOneBy({ id, is_deleted: false })
+    if (!businessHoliday) {
+      throw new BadRequestException('business holiday not found')
+    }
+
+    businessHoliday.is_deleted = true
+    await this.repo.save(businessHoliday)
+  }
+}
