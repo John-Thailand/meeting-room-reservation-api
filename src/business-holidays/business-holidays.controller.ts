@@ -4,8 +4,11 @@ import { AdminGuard } from 'src/guards/admin.guard';
 import { BusinessHoliday } from './business-holiday.entity';
 import { CreateBusinessHolidayDto } from './dtos/create-business-holiday.dto';
 import { UpdateBusinessHolidayDto } from './dtos/update-business-holiday.dto';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { BusinessHolidayDto } from './dtos/business-holiday.dto';
 
 @Controller()
+@Serialize(BusinessHolidayDto)
 export class BusinessHolidaysController {
   constructor(
     private businessHolidaysService: BusinessHolidaysService
