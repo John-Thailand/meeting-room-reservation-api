@@ -10,6 +10,7 @@ import { CoworkingSpace } from "./coworking-spaces/coworking-space.entity";
 import { BusinessHolidaysModule } from './business-holidays/business-holidays.module';
 import { BusinessHoliday } from "./business-holidays/business-holiday.entity";
 import { MeetingRoomsModule } from './meeting-rooms/meeting-rooms.module';
+import { MeetingRoom } from "./meeting-rooms/meeting-room.entity";
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { MeetingRoomsModule } from './meeting-rooms/meeting-rooms.module';
         return {
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
-          entities: [User, CoworkingSpace, BusinessHoliday],
+          entities: [User, CoworkingSpace, BusinessHoliday, MeetingRoom],
           synchronize: true,
         }
       }
