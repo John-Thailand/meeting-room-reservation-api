@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, HttpCode, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, HttpCode, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { BusinessHolidaysService } from './business-holidays.service';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { BusinessHoliday } from './business-holiday.entity';
 import { CreateBusinessHolidayDto } from './dtos/create-business-holiday.dto';
+import { UpdateBusinessHolidayDto } from './dtos/update-business-holiday.dto';
 
 @Controller()
 export class BusinessHolidaysController {
@@ -17,6 +18,16 @@ export class BusinessHolidaysController {
     @Body() body: CreateBusinessHolidayDto,
   ): Promise<BusinessHoliday> {
     const businessHoliday = await this.businessHolidaysService.create(coworkingSpaceId, body.business_holiday)
+    return businessHoliday
+  }
+
+  @Patch('business-holidays/:business_holiday_id')
+  @UseGuards(AdminGuard)
+  async updateBusinessHoliday(
+    @Param('business_holiday_id') businessHolidayId: string,
+    @Body() body: UpdateBusinessHolidayDto,
+  ): Promise<BusinessHoliday> {
+    const businessHoliday = await this.businessHolidaysService.update(businessHolidayId, body)
     return businessHoliday
   }
 
