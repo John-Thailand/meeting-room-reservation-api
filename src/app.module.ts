@@ -9,6 +9,7 @@ import { CoworkingSpacesModule } from './coworking-spaces/coworking-spaces.modul
 import { CoworkingSpace } from "./coworking-spaces/coworking-space.entity";
 import { BusinessHolidaysModule } from './business-holidays/business-holidays.module';
 import { BusinessHoliday } from "./business-holidays/business-holiday.entity";
+import { MeetingRoomsModule } from './meeting-rooms/meeting-rooms.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { BusinessHoliday } from "./business-holidays/business-holiday.entity";
     UsersModule,
     CoworkingSpacesModule,
     BusinessHolidaysModule,
+    MeetingRoomsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
