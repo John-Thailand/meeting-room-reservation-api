@@ -13,14 +13,14 @@ export class SearchBusinessHolidaysRequestDto {
   end_date: Date;
 
   @IsString()
-  @IsIn(['created_at', 'updated_at'])
+  @IsIn(['business_holiday', 'created_at', 'updated_at'])
   @IsOptional()
-  order_by: 'created_at' | 'updated_at' = 'created_at';
+  order_by: 'business_holiday' | 'created_at' | 'updated_at' = 'business_holiday';
 
   @IsString()
   @IsIn(['desc', 'asc'])
   @IsOptional()
-  order: 'desc' | 'asc' = 'desc';
+  order: 'desc' | 'asc' = 'asc';
 
   @Type(() => Number)
   @IsInt()

@@ -3,6 +3,8 @@ import { BusinessHoliday } from './business-holiday.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoworkingSpacesService } from 'src/coworking-spaces/coworking-spaces.service';
+import { SearchBusinessHolidaysRequestDto } from './dtos/search-business-holidays-request.dto';
+import { SearchBusinessHollidaysResponseDto } from './dtos/search-business-holidays-response.dto';
 
 @Injectable()
 export class BusinessHolidaysService {
@@ -10,6 +12,50 @@ export class BusinessHolidaysService {
     private coworkingSpacesService: CoworkingSpacesService,
     @InjectRepository(BusinessHoliday) private repo: Repository<BusinessHoliday>,
   ) {}
+
+  async search(
+    coworkingSpaceId: string,
+    dto: SearchBusinessHolidaysRequestDto
+  ): Promise<SearchBusinessHollidaysResponseDto> {
+    // コワーキングスペースが存在しない場合、エラーを返す
+    const coworkingSpace = await this.coworkingSpacesService.findOne(coworkingSpaceId)
+    if (!coworkingSpace) {
+      throw new NotFoundException('coworking space not found')
+    }
+
+    let query = this.repo.createQueryBuilder()
+
+    if (dto.start_date && dto.end_date) {
+      query = query.andWhere('business_holiday BETWEEN :start_date AND :end_date', {
+        start_date: dto.start_date,
+        end_date: dto.end_date
+      })
+    } else if (dto.start_date) {
+      query = query.andWhere('business_holiday >= :start_date', {
+        start_date: dto.start_date
+      })
+    } else if (dto.end_date) {
+      query = query.andWhere('business_holiday <= :end_date', {
+        end_date: dto.end_date
+      })
+    }
+
+    const order = dto.order.toUpperCase() as 'ASC' | 'DESC'
+    query = query.orderBy(dto.order_by, order)
+
+    const allCount = await query.getCount()
+
+    query = query
+      .limit(dto.page_size)
+      .offset(dto.page)
+
+    const businessHolidays = await query.getMany()
+
+    return {
+      business_holidays: businessHolidays,
+      total: allCount,
+    }
+  }
 
   async create(coworkingSpaceId: string, businessHoliday: Date): Promise<BusinessHoliday> {
     // 指定IDのコワーキングスペースが存在しない場合、エラーを返す
