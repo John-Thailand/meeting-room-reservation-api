@@ -2,8 +2,11 @@ import { Body, Controller, Param, Post } from '@nestjs/common';
 import { MeetingRoomsService } from './meeting-rooms.service';
 import { MeetingRoom } from './meeting-room.entity';
 import { CreateMeetingRoomDto } from './dtos/create-meeting-room.dto';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { MeetingRoomDto } from './dtos/meeting-room.dto';
 
 @Controller()
+@Serialize(MeetingRoomDto)
 export class MeetingRoomsController {
   constructor(private meetingRoomsService: MeetingRoomsService) {}
 
