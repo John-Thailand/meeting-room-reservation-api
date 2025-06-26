@@ -8,23 +8,23 @@ export class BusinessHoliday {
 
   // 多くのBusinessHolidayが１つのCoworkingSpaceに属する
   // 親であるCoworkingSpaceが削除されたときに、自動でこのBusinessHolidayも削除されるようにする
-  @ManyToOne(() => CoworkingSpace, { onDelete: 'CASCADE' })
+  @ManyToOne(() => CoworkingSpace, { onDelete: 'CASCADE', nullable: false })
   // 外部キーのカラム名をcoworking_space_idとする
   @JoinColumn({ name: 'coworking_space_id' })
   coworkingSpace: CoworkingSpace;
 
-  @Column({ name: 'coworking_space_id' })
+  @Column({ name: 'coworking_space_id', nullable: false })
   coworking_space_id: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'datetime', nullable: false })
   business_holiday: Date;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, nullable: false })
   is_deleted: boolean;
 
-  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', nullable: false })
   created_at: Date;
 
-  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP', nullable: false })
   updated_at: Date;
 }

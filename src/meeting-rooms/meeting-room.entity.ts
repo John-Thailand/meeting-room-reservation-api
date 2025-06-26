@@ -5,18 +5,18 @@ export class MeetingRoom {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: false })
   coworking_space_id: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: false })
   name: string;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, nullable: false })
   is_deleted: boolean;
 
-  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', nullable: false })
   created_at: Date;
 
-  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP', nullable: false })
   updated_at: Date;
 }
