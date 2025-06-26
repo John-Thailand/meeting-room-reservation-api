@@ -2,21 +2,21 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { MeetingRoom } from './meeting-room.entity';
 import { Repository } from 'typeorm';
+import { CoworkingSpacesService } from 'src/coworking-spaces/coworking-spaces.service';
 
 @Injectable()
 export class MeetingRoomsService {
-  constructor(@InjectRepository(MeetingRoom) private repo: Repository<MeetingRoom>) {}
+  constructor(
+    @InjectRepository(MeetingRoom) private repo: Repository<MeetingRoom>,
+    private coworkingSpacesService: CoworkingSpacesService,
+  ) {}
 
   async create(
     coworkingSpaceId: string,
     name: string,
   ): Promise<MeetingRoom> {
     // コワーキングスペースが存在しない場合、エラーを返す
-    // TODO: コワーキングのrepoを使わないと
-    const coworkingSpace = await this.repo.findOneBy({
-      id: coworkingSpaceId,
-      is_deleted: false
-    })
+    const coworkingSpace = await this.coworkingSpacesService.findOne(coworkingSpaceId)
     if (!coworkingSpace) {
       throw new NotFoundException('coworking space not found')
     }
