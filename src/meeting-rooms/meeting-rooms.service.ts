@@ -24,7 +24,8 @@ export class MeetingRoomsService {
     // そのコワーキングスペースに同じ名前の会議室が既に存在している場合、エラーを返す
     const existingMeetingRoom = await this.repo.findOneBy({
       coworking_space_id: coworkingSpace.id,
-      name
+      name,
+      is_deleted: false
     })
     if (existingMeetingRoom) {
       throw new BadRequestException('already exist the meeting room')
@@ -36,5 +37,16 @@ export class MeetingRoomsService {
     })
 
     return this.repo.save(meetingRoom)
+  }
+
+  async delete(id: string): Promise<void> {
+    // もし会議室が存在しない場合、エラーを返す
+    const existingMeetingRoom = await this.repo.findOneBy({ id, is_deleted: false })
+    if (!existingMeetingRoom) {
+      throw new NotFoundException('meeting room not found')
+    }
+
+    existingMeetingRoom.is_deleted = true
+    await this.repo.save(existingMeetingRoom)
   }
 }
