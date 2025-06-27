@@ -8,7 +8,7 @@ import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { BusinessHolidayDto } from './dtos/business-holiday.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { SearchBusinessHolidaysRequestDto } from 'src/business-holidays/dtos/search-business-holidays-request.dto';
-import { SearchBusinessHollidaysResponseDto } from './dtos/search-business-holidays-response.dto';
+import { SearchBusinessHolidaysResponseDto } from './dtos/search-business-holidays-response.dto';
 
 @Controller()
 export class BusinessHolidaysController {
@@ -18,11 +18,11 @@ export class BusinessHolidaysController {
 
   @Get('coworking-spaces/:coworking_space_id/business-holidays')
   @UseGuards(AuthGuard)
-  @Serialize(SearchBusinessHollidaysResponseDto)
+  @Serialize(SearchBusinessHolidaysResponseDto)
   async searchBusinessHolidays(
     @Param('coworking_space_id') coworkingSpaceId: string,
     @Query() query: SearchBusinessHolidaysRequestDto
-  ): Promise<SearchBusinessHollidaysResponseDto> {
+  ): Promise<SearchBusinessHolidaysResponseDto> {
     return this.businessHolidaysService.search(coworkingSpaceId, query)
   }
 
