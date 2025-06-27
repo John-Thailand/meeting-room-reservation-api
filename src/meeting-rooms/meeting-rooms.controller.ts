@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, HttpCode, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { MeetingRoomsService } from './meeting-rooms.service';
 import { MeetingRoom } from './meeting-room.entity';
 import { CreateMeetingRoomDto } from './dtos/create-meeting-room.dto';
@@ -6,11 +6,21 @@ import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { MeetingRoomDto } from './dtos/meeting-room.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { UpdateMeetingRoomDto } from './dtos/update-meeting-room.dto';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller()
 @Serialize(MeetingRoomDto)
 export class MeetingRoomsController {
   constructor(private meetingRoomsService: MeetingRoomsService) {}
+
+  @Get('coworking-spaces/:coworking_space_id/meeting-rooms')
+  @UseGuards(AuthGuard)
+  async getMeetingRooms(
+    @Param('coworking_space_id') coworkingSpaceId: string
+  ): Promise<MeetingRoom[]> {
+    const meetingRooms = await this.meetingRoomsService.find(coworkingSpaceId)
+    return meetingRooms
+  }
 
   @Post('coworking-spaces/:coworking_space_id/meeting-rooms')
   @UseGuards(AdminGuard)

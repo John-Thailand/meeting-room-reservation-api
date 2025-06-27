@@ -12,6 +12,20 @@ export class MeetingRoomsService {
     private coworkingSpacesService: CoworkingSpacesService,
   ) {}
 
+  async find(coworkingSpaceId: string): Promise<MeetingRoom[]> {
+    const coworkingSpace = await this.coworkingSpacesService.findOne(coworkingSpaceId)
+    if (!coworkingSpace) {
+      throw new NotFoundException('coworking space not found')
+    }
+
+    return this.repo.find({
+      where: {
+        is_deleted: false,
+        coworking_space_id: coworkingSpaceId
+      }
+    })
+  }
+
   async create(
     coworkingSpaceId: string,
     name: string,
