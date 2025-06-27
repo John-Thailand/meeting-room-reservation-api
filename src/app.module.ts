@@ -1,7 +1,5 @@
 import { Module } from "@nestjs/common";
 import { UsersModule } from "./users/users.module";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./users/user.entity";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -41,7 +39,7 @@ import { MeetingRoom } from "./meeting-rooms/meeting-room.entity";
     BusinessHolidaysModule,
     MeetingRoomsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
