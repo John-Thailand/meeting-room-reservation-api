@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, HttpCode, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, HttpCode, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { MeetingRoomsService } from './meeting-rooms.service';
 import { MeetingRoom } from './meeting-room.entity';
 import { CreateMeetingRoomDto } from './dtos/create-meeting-room.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { MeetingRoomDto } from './dtos/meeting-room.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
+import { UpdateMeetingRoomDto } from './dtos/update-meeting-room.dto';
 
 @Controller()
 @Serialize(MeetingRoomDto)
@@ -18,6 +19,16 @@ export class MeetingRoomsController {
     @Body() body: CreateMeetingRoomDto,
   ): Promise<MeetingRoom> {
     const meetingRoom = await this.meetingRoomsService.create(coworkingSpaceId, body.name)
+    return meetingRoom
+  }
+
+  @Patch('meeting-rooms/:meeting_room_id')
+  @UseGuards(AdminGuard)
+  async updateMeetingRoom(
+    @Param('meeting_room_id') meetingRoomId: string,
+    @Body() body: UpdateMeetingRoomDto,
+  ): Promise<MeetingRoom> {
+    const meetingRoom = await this.meetingRoomsService.update(meetingRoomId, body)
     return meetingRoom
   }
 
