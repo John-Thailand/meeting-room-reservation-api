@@ -26,6 +26,14 @@ export class MeetingRoomsService {
     })
   }
 
+  async findOne(id: string): Promise<MeetingRoom> {
+    // idがnullだとfindOneByは最初の要素を返してしまう
+    if (!id) {
+      return null
+    }
+    return this.repo.findOneBy({ id })
+  }
+
   async create(
     coworkingSpaceId: string,
     name: string,
