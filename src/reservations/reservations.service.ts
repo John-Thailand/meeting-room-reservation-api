@@ -28,8 +28,6 @@ export class ReservationsService {
     const now = new Date()
     const thisYear = now.getFullYear()
     const thisMonth = now.getMonth()
-    console.log(thisYear)
-    console.log(thisMonth)
     if (
       dto.start_datetime.getFullYear() !== thisYear || dto.start_datetime.getMonth() !== thisMonth
       || dto.end_datetime.getFullYear() !== thisYear || dto.end_datetime.getMonth() !== thisMonth
@@ -51,19 +49,21 @@ export class ReservationsService {
     }
 
     // 会議室の開店時間〜閉店時間内の予約かどうかチェック
-    const coworkingSpace = await this.coworkingSpaces.findOne(meetingRoom.id)
+    const coworkingSpace = await this.coworkingSpaces.findOne(meetingRoom.coworking_space_id)
     if (!coworkingSpace) {
       throw new BadRequestException('coworking space not found')
     }
 
-    const openTime = new Date(dto.start_datetime)
-    const closeTime = new Date(dto.end_datetime)
-    const [openHour, openMinute, openSecond] = coworkingSpace.open_time.split(':').map(Number);
-    const [closeHour, closeMinute, closeSecond] = coworkingSpace.close_time.split(':').map(Number);
-    openTime.setHours(openHour, openMinute, 0, 0)
-    closeTime.setHours(closeHour, closeMinute, 0, 0)
+    const start_hours = dto.start_datetime.getHours()
+    const start_minutes = dto.start_datetime.getMinutes()
 
-    if (dto.start_datetime < openTime || dto.end_datetime > closeTime) {
+    const end_hours = dto.end_datetime.getHours()
+    const end_minutes = dto.end_datetime.getMinutes()
+
+    const [openHour, openMinute] = coworkingSpace.open_time.split(':').map(Number)
+    const [closeHour, closeMinute] = coworkingSpace.close_time.split(':').map(Number)
+
+    if (!(start_hours >= openHour && start_minutes >= openMinute) || !(end_hours <= closeHour && end_minutes <= closeMinute)) {
       throw new BadRequestException('reservation must be within coworking space business hours')
     }
 
@@ -78,7 +78,7 @@ export class ReservationsService {
       .andWhere('is_deleted = :is_deleted', {
         is_deleted: false
       })
-      .andWhere('end_datetime BETWEEN :start_of_this_month AND : end_of_this_month', {
+      .andWhere('end_datetime BETWEEN :start_of_this_month AND :end_of_this_month', {
         start_of_this_month: startOfThisMonth,
         end_of_this_month: endOfThisMonth
       })
