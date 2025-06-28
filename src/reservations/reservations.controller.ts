@@ -3,6 +3,8 @@ import { ReservationsService } from './reservations.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreateMyReservationDto } from './dtos/create-my-reservation.dto';
 import { Reservation } from './reservation.entity';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { ReservationDto } from './dtos/reservation.dto';
 
 @Controller()
 export class ReservationsController {
@@ -10,6 +12,7 @@ export class ReservationsController {
 
   @Post('users/me/reservations')
   @UseGuards(AuthGuard)
+  @Serialize(ReservationDto)
   async createMyReservation(
     @Body() body: CreateMyReservationDto,
     @Session() session: any,
