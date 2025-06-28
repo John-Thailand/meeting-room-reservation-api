@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Session, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, HttpCode, Param, Post, Session, UseGuards } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreateMyReservationDto } from './dtos/create-my-reservation.dto';
@@ -23,5 +23,17 @@ export class ReservationsController {
       body,
     )
     return myReservation
+  }
+
+  @Delete('users/me/reservations/:id')
+  @UseGuards(AuthGuard)
+  @Serialize(ReservationDto)
+  @HttpCode(204)
+  async deleteMyReservation(
+    @Param('id') id: string,
+    @Session() session: any
+  ): Promise<void> {
+    const userId = session.userId as string
+    await this.reservationsService.deleteMyReservation(userId, id)
   }
 }

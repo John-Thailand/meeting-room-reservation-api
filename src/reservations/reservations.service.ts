@@ -127,4 +127,22 @@ export class ReservationsService {
 
     return this.repo.save(myReservation)
   }
+
+  async deleteMyReservation(
+    userId: string,
+    reservationId: string
+  ): Promise<void> {
+    // その予約が存在しない場合、エラーを返す
+    const reservation = await this.repo.findOneBy({
+      id: reservationId,
+      user_id: userId,
+      is_deleted: false
+    })
+    if (!reservation) {
+      throw new BadRequestException('reservation not found')
+    }
+
+    reservation.is_deleted = true
+    this.repo.save(reservation)
+  }
 }
