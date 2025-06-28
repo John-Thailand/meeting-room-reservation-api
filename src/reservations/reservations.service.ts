@@ -7,13 +7,15 @@ import { MeetingRoomsService } from 'src/meeting-rooms/meeting-rooms.service';
 import { CoworkingSpacesService } from 'src/coworking-spaces/coworking-spaces.service';
 
 import * as moment from 'moment-timezone'
+import { BusinessHolidaysService } from 'src/business-holidays/business-holidays.service';
 
 @Injectable()
 export class ReservationsService {
   constructor(
     @InjectRepository(Reservation) private repo: Repository<Reservation>,
     private meetingRoomsService: MeetingRoomsService,
-    private coworkingSpaces: CoworkingSpacesService,
+    private coworkingSpacesService: CoworkingSpacesService,
+    private businessHolidaysService: BusinessHolidaysService
   ) {}
 
   async createMyReservation(
@@ -52,7 +54,7 @@ export class ReservationsService {
     }
 
     // 会議室の開店時間〜閉店時間内の予約かどうかチェック
-    const coworkingSpace = await this.coworkingSpaces.findOne(meetingRoom.coworking_space_id)
+    const coworkingSpace = await this.coworkingSpacesService.findOne(meetingRoom.coworking_space_id)
     if (!coworkingSpace) {
       throw new BadRequestException('coworking space not found')
     }

@@ -6,12 +6,39 @@ import { CoworkingSpacesService } from 'src/coworking-spaces/coworking-spaces.se
 import { SearchBusinessHolidaysRequestDto } from './dtos/search-business-holidays-request.dto';
 import { SearchBusinessHolidaysResponseDto } from './dtos/search-business-holidays-response.dto';
 
+import * as moment from 'moment-timezone'
+
 @Injectable()
 export class BusinessHolidaysService {
   constructor(
     private coworkingSpacesService: CoworkingSpacesService,
     @InjectRepository(BusinessHoliday) private repo: Repository<BusinessHoliday>,
   ) {}
+
+  async findOne(
+    coworkingSpaceId: string,
+    businessHoliday: Date,
+  ): Promise<BusinessHoliday> {
+    // コワーキングスペースが存在しない場合、エラーを返す
+    const coworkingSpace = await this.coworkingSpacesService.findOne(coworkingSpaceId)
+    if (!coworkingSpace) {
+      throw new NotFoundException('coworking space not found')
+    }
+
+    const query = this.repo
+      .createQueryBuilder()
+      .andWhere('coworking_space_id = :coworking_space_id', {
+        coworking_space_id: coworkingSpaceId
+      })
+      .andWhere('business_holiday = :business_holiday', {
+        business_holiday: businessHoliday
+      })
+      .where('is_deleted = :is_deleted', {
+        is_deleted: false
+      })
+
+    return await query.getOne()
+  }
 
   async search(
     coworkingSpaceId: string,
@@ -76,7 +103,7 @@ export class BusinessHolidaysService {
 
     const businessHolidayEntity = this.repo.create({
       coworking_space_id: coworkingSpaceId,
-      business_holiday: businessHoliday
+      business_holiday: moment(businessHoliday).tz('Asia/Tokyo').utc().toDate()
     })
 
     return this.repo.save(businessHolidayEntity)

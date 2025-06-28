@@ -9,10 +9,18 @@ import { CoworkingSpacesService } from 'src/coworking-spaces/coworking-spaces.se
 import { CoworkingSpace } from 'src/coworking-spaces/coworking-space.entity';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.entity';
+import { BusinessHoliday } from 'src/business-holidays/business-holiday.entity';
+import { BusinessHolidaysService } from 'src/business-holidays/business-holidays.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Reservation, MeetingRoom, CoworkingSpace, User])],
+  imports: [TypeOrmModule.forFeature([Reservation, MeetingRoom, CoworkingSpace, User, BusinessHoliday])],
   controllers: [ReservationsController],
-  providers: [ReservationsService, MeetingRoomsService, CoworkingSpacesService, UsersService]
+  providers: [
+    ReservationsService,
+    MeetingRoomsService,
+    CoworkingSpacesService,
+    UsersService,
+    BusinessHolidaysService
+  ]
 })
 export class ReservationsModule {}
