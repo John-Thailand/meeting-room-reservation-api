@@ -6,6 +6,8 @@ import { CreateMyReservationDto } from './dtos/create-my-reservation.dto';
 import { MeetingRoomsService } from 'src/meeting-rooms/meeting-rooms.service';
 import { CoworkingSpacesService } from 'src/coworking-spaces/coworking-spaces.service';
 
+import * as moment from 'moment-timezone'
+
 @Injectable()
 export class ReservationsService {
   constructor(
@@ -25,12 +27,13 @@ export class ReservationsService {
     }
 
     // 今月分の予約かどうか
-    const now = new Date()
-    const thisYear = now.getFullYear()
-    const thisMonth = now.getMonth()
-    if (
-      dto.start_datetime.getFullYear() !== thisYear || dto.start_datetime.getMonth() !== thisMonth
-      || dto.end_datetime.getFullYear() !== thisYear || dto.end_datetime.getMonth() !== thisMonth
+    const nowJst = moment().tz('Asia/Tokyo')
+
+    const startJst = moment(dto.start_datetime).tz('Asia/Tokyo')
+    const endJst = moment(dto.end_datetime).tz('Asia/Tokyo')
+
+    if (startJst.month() !== nowJst.month() || startJst.year() !== nowJst.year() ||
+        endJst.month() !== nowJst.month() || endJst.year() !== nowJst.year()
     ) {
       throw new BadRequestException('you must reserve the meeting room for this month')
     }
@@ -54,22 +57,27 @@ export class ReservationsService {
       throw new BadRequestException('coworking space not found')
     }
 
-    const start_hours = dto.start_datetime.getHours()
-    const start_minutes = dto.start_datetime.getMinutes()
-
-    const end_hours = dto.end_datetime.getHours()
-    const end_minutes = dto.end_datetime.getMinutes()
-
     const [openHour, openMinute] = coworkingSpace.open_time.split(':').map(Number)
     const [closeHour, closeMinute] = coworkingSpace.close_time.split(':').map(Number)
 
-    if (!(start_hours >= openHour && start_minutes >= openMinute) || !(end_hours <= closeHour && end_minutes <= closeMinute)) {
+    const startHour = startJst.hour()
+    const startMinute = startJst.minute()
+    const endHour = endJst.hour()
+    const endMinute = endJst.minute()
+
+    const isStartInBusinessHours =
+      startHour > openHour || (startHour === openHour && startMinute >= openMinute)
+    const isEndInBusinessHours =
+      endHour < closeHour || (endHour === closeHour && endMinute <= closeMinute)
+
+    if (!isStartInBusinessHours || !isEndInBusinessHours) {
       throw new BadRequestException('reservation must be within coworking space business hours')
     }
 
     // ユーザーは１ヶ月に6回分まで会議室の予約ができる
-    const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const endOfThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
+    const startOfThisMonth = nowJst.clone().startOf('month').startOf('day').utc().toDate()
+    const endOfThisMonth = nowJst.clone().endOf('month').endOf('day').utc().toDate()
+
     const myThisMonthReservationCount = await this.repo
       .createQueryBuilder()
       .where('user_id = :user_id', {
@@ -98,8 +106,8 @@ export class ReservationsService {
         meeting_room_id: dto.meeting_room_id
       })
       .andWhere('start_datetime < :end_reservation_datetime AND end_datetime > :start_reservation_datetime ', {
-        start_of_this_month: startOfThisMonth,
-        end_of_this_month: endOfThisMonth
+        start_reservation_datetime: startJst.toDate(),
+        end_reservation_datetime: endJst.toDate()
       })
       .getCount()
 
