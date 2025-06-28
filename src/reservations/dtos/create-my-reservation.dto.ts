@@ -1,9 +1,11 @@
 import { Type } from "class-transformer";
-import { IsDate, IsString } from "class-validator";
+import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
 import { IsQuartersHourDate } from "../validators/is_quarters_hour_date.validator";
 
 export class CreateMyReservationDto {
   @IsString()
+  @IsUUID()
+  @IsNotEmpty()
   meeting_room_id: string;
 
   @Type(() => Date)

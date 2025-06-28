@@ -1,7 +1,8 @@
-import { IsOptional, IsString, Length } from "class-validator";
+import { IsOptional, IsString, IsUUID, Length } from "class-validator";
 
 export class UpdateMeetingRoomDto {
   @IsString()
+  @IsUUID()
   @IsOptional()
   coworking_space_id: string;
 

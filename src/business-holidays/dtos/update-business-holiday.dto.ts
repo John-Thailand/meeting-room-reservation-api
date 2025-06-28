@@ -1,8 +1,9 @@
 import { Type } from "class-transformer";
-import { IsDate, IsOptional, IsString } from "class-validator";
+import { IsDate, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class UpdateBusinessHolidayDto {
   @IsString()
+  @IsUUID()
   @IsOptional()
   coworking_space_id: string;
 
