@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoworkingSpacesService } from 'src/coworking-spaces/coworking-spaces.service';
 import { SearchBusinessHolidaysRequestDto } from './dtos/search-business-holidays-request.dto';
-import { SearchBusinessHollidaysResponseDto } from './dtos/search-business-holidays-response.dto';
+import { SearchBusinessHolidaysResponseDto } from './dtos/search-business-holidays-response.dto';
 
 @Injectable()
 export class BusinessHolidaysService {
@@ -16,7 +16,7 @@ export class BusinessHolidaysService {
   async search(
     coworkingSpaceId: string,
     dto: SearchBusinessHolidaysRequestDto
-  ): Promise<SearchBusinessHollidaysResponseDto> {
+  ): Promise<SearchBusinessHolidaysResponseDto> {
     // コワーキングスペースが存在しない場合、エラーを返す
     const coworkingSpace = await this.coworkingSpacesService.findOne(coworkingSpaceId)
     if (!coworkingSpace) {
