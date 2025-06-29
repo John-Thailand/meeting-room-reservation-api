@@ -29,10 +29,14 @@ import { Reservation } from "./reservations/reservation.entity";
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         return {
-          type: 'sqlite',
+          type: 'mysql',
+          host: config.get<string>('DB_HOST'),
+          port: config.get<number>('DB_PORT'),
+          username: config.get<string>('DB_USER'),
+          password: config.get<string>('DB_PASS'),
           database: config.get<string>('DB_NAME'),
           entities: [User, CoworkingSpace, BusinessHoliday, MeetingRoom, Reservation],
-          synchronize: true,
+          synchronize: false,
         }
       }
     }),
