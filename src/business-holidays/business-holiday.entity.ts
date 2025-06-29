@@ -1,7 +1,8 @@
+import { MinDate } from "class-validator";
 import { CoworkingSpace } from "src/coworking-spaces/coworking-space.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity('business_holidays')
 export class BusinessHoliday {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -16,7 +17,7 @@ export class BusinessHoliday {
   @Column({ name: 'coworking_space_id', nullable: false })
   coworking_space_id: string;
 
-  @Column({ type: 'datetime', nullable: false })
+  @Column({ type: 'date', nullable: false })
   business_holiday: Date;
 
   @Column({ type: 'boolean', default: false, nullable: false })

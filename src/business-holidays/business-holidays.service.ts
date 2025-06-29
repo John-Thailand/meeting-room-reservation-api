@@ -5,9 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CoworkingSpacesService } from 'src/coworking-spaces/coworking-spaces.service';
 import { SearchBusinessHolidaysRequestDto } from './dtos/search-business-holidays-request.dto';
 import { SearchBusinessHolidaysResponseDto } from './dtos/search-business-holidays-response.dto';
-
-import * as moment from 'moment-timezone'
-
 @Injectable()
 export class BusinessHolidaysService {
   constructor(
@@ -103,7 +100,7 @@ export class BusinessHolidaysService {
 
     const businessHolidayEntity = this.repo.create({
       coworking_space_id: coworkingSpaceId,
-      business_holiday: moment(businessHoliday).tz('Asia/Tokyo').utc().toDate()
+      business_holiday: businessHoliday,
     })
 
     return this.repo.save(businessHolidayEntity)
