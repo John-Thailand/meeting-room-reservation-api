@@ -12,6 +12,8 @@
 
 ④ 下記のコマンドを実行して、テーブルを作成する
 
+BEGIN;
+
 CREATE TABLE app_db.coworking_spaces (
   id CHAR(36) PRIMARY KEY,
   name VARCHAR(50) UNIQUE NOT NULL,
@@ -21,8 +23,6 @@ CREATE TABLE app_db.coworking_spaces (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
-INSERT INTO app_db.coworking_spaces (id, name, open_time, close_time) VALUES (UUID(), '福岡コワーキングスペース', '09:00:00', '21:00:00'); 
 
 CREATE TABLE app_db.users (
   id CHAR(36) PRIMARY KEY,
@@ -35,8 +35,6 @@ CREATE TABLE app_db.users (
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-INSERT INTO app_db.users (id, email, password, constract_start_date) VALUES (UUID(), 'test@gmail.com', 'tesT1234_', '2025-06-01');
-
 CREATE TABLE app_db.business_holidays (
   id CHAR(36) PRIMARY KEY,
   coworking_space_id CHAR(36) NOT NULL,
@@ -48,8 +46,6 @@ CREATE TABLE app_db.business_holidays (
   UNIQUE KEY uniq_space_holiday (coworking_space_id, business_holiday)
 );
 
-INSERT INTO app_db.business_holidays (id, coworking_space_id, business_holiday) VALUES (UUID(), '5378bd7d-5417-11f0-a1cb-0242ac1b0002', '2025-06-12');
-
 CREATE TABLE app_db.meeting_rooms (
   id CHAR(36) PRIMARY KEY,
   coworking_space_id CHAR(36) NOT NULL,
@@ -60,8 +56,6 @@ CREATE TABLE app_db.meeting_rooms (
   FOREIGN KEY (coworking_space_id) REFERENCES coworking_spaces(id) ON DELETE CASCADE,
   UNIQUE KEY uniq_space_meeting (coworking_space_id, name)
 );
-
-INSERT INTO app_db.meeting_rooms (id, coworking_space_id, name) VALUES (UUID(), '5378bd7d-5417-11f0-a1cb-0242ac1b0002', '会議室A');
 
 CREATE TABLE app_db.reservations (
   id CHAR(36) PRIMARY KEY,
@@ -76,4 +70,14 @@ CREATE TABLE app_db.reservations (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+COMMIT;
+
+INSERT INTO app_db.coworking_spaces (id, name, open_time, close_time) VALUES (UUID(), '福岡コワーキングスペース', '09:00:00', '21:00:00'); 
+
+INSERT INTO app_db.users (id, email, password, constract_start_date) VALUES (UUID(), 'test@gmail.com', 'tesT1234_', '2025-06-01');
+
+INSERT INTO app_db.business_holidays (id, coworking_space_id, business_holiday) VALUES (UUID(), '5378bd7d-5417-11f0-a1cb-0242ac1b0002', '2025-06-12');
+
 INSERT INTO app_db.reservations (id, meeting_room_id, user_id, start_datetime, end_datetime) VALUES (UUID(), '96530dac-548b-11f0-ae2e-0242ac1b0002', '6f616325-541b-11f0-92d1-0242ac1b0002', '2025-06-27 06:00:00', '2025-06-27 06:00:00');
+
+INSERT INTO app_db.meeting_rooms (id, coworking_space_id, name) VALUES (UUID(), '5378bd7d-5417-11f0-a1cb-0242ac1b0002', '会議室A');
