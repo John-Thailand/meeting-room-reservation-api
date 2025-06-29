@@ -31,9 +31,21 @@ export class AuthService {
   }
 
   async signin(email: string, password: string): Promise<User> {
+    // ユーザーが存在しない場合は、エラーを返す
     const [user] = await this.usersService.find(email)
     if (!user) {
       throw new NotFoundException('user not found')
+    }
+
+    // 契約が終了している場合は、エラーを返す
+    const today = new Date()
+    const contractStartDate = new Date(user.contract_start_date)
+    const withdrawalDate = user.withdrawal_date ? new Date(user.withdrawal_date) : null
+
+    const isContractPeriod = 
+      contractStartDate <= today && (!withdrawalDate || today <= withdrawalDate)
+    if (!isContractPeriod) {
+      throw new BadRequestException('the user has terminated the contract')
     }
 
     const [salt, storedHash] = user.password.split('.')

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Query, Session, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query, Session, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -51,6 +51,13 @@ export class UsersController {
     return this.usersService.update(id, body)
   }
 
+  @Delete('users/:id')
+  @UseGuards(AdminGuard)
+  @HttpCode(204)
+  deleteUser(@Param('id') id: string): Promise<void> {
+    return this.usersService.delete(id)
+  }
+
   @Patch('users/:id/withdraw')
   @UseGuards(AdminGuard)
   @Serialize(UserDto)
@@ -92,6 +99,7 @@ export class UsersController {
   }
 
   @Get('users/:id')
+  @UseGuards(AdminGuard)
   @Serialize(UserDto)
   async findUser(@Param('id') id: string): Promise<User> {
     console.log('handler is running')
@@ -100,11 +108,5 @@ export class UsersController {
       throw new NotFoundException('user not found')
     }
     return user
-  }
-
-  @Get('users')
-  @Serialize(UserDto)
-  findAllUsers(@Query('email') email: string): Promise<User[]> {
-    return this.usersService.find(email)
   }
 }

@@ -1,6 +1,6 @@
 import { AfterInsert, AfterRemove, AfterUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -20,6 +20,9 @@ export class User {
 
   @Column({ type: 'datetime', nullable: true, default: null })
   withdrawal_date: Date;
+
+  @Column({ type: 'boolean', default: false, nullable: false })
+  is_deleted: boolean;
 
   // datetime型：日付 + 時刻（2025-06-20 12:34:56）
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', nullable: false })

@@ -30,11 +30,11 @@ export class UsersService {
     if (!id) {
       return null
     }
-    return this.repo.findOneBy({ id })
+    return this.repo.findOneBy({ id, is_deleted: false })
   }
 
   find(email: string): Promise<User[]> {
-    return this.repo.find({ where:  { email } })
+    return this.repo.find({ where:  { email, is_deleted: false } })
   }
 
   async update(id: string, attrs: Partial<User>): Promise<User> {
@@ -154,10 +154,14 @@ export class UsersService {
   }
 
   async search(dto: SearchUsersRequestDto): Promise<SearchUsersResponseDto> {
-    let query =  this.repo.createQueryBuilder()
+    let query =  this.repo
+      .createQueryBuilder()
+      .where('is_deleted = :is_deleted', {
+        is_deleted: false
+      })
 
     if (dto.email) {
-      query = query.where('email LIKE :email', {
+      query = query.andWhere('email LIKE :email', {
         email: `%${dto.email}%`
       })
     }
@@ -214,11 +218,13 @@ export class UsersService {
     }
   }
 
-  async remove(id: string): Promise<User> {
+  async delete(id: string): Promise<void> {
     const user = await this.findOne(id)
     if (!user) {
       throw new NotFoundException('user not found')
     }
-    return this.repo.remove(user)
+    
+    user.is_deleted = true
+    this.repo.save(user)
   }
 }
