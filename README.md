@@ -62,3 +62,18 @@ CREATE TABLE app_db.meeting_rooms (
 );
 
 INSERT INTO app_db.meeting_rooms (id, coworking_space_id, name) VALUES (UUID(), '5378bd7d-5417-11f0-a1cb-0242ac1b0002', '会議室A');
+
+CREATE TABLE app_db.reservations (
+  id CHAR(36) PRIMARY KEY,
+  meeting_room_id CHAR(36) NOT NULL,
+  user_id CHAR(36) NOT NULL,
+  start_datetime DATETIME NOT NULL,
+  end_datetime DATETIME NOT NULL,
+  is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (meeting_room_id) REFERENCES meeting_rooms(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+INSERT INTO app_db.reservations (id, meeting_room_id, user_id, start_datetime, end_datetime) VALUES (UUID(), '96530dac-548b-11f0-ae2e-0242ac1b0002', '6f616325-541b-11f0-92d1-0242ac1b0002', '2025-06-27 06:00:00', '2025-06-27 06:00:00');
