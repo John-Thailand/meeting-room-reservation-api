@@ -36,3 +36,29 @@ CREATE TABLE app_db.users (
 );
 
 INSERT INTO app_db.users (id, email, password, constract_start_date) VALUES (UUID(), 'test@gmail.com', 'tesT1234_', '2025-06-01');
+
+CREATE TABLE app_db.business_holidays (
+  id CHAR(36) PRIMARY KEY,
+  coworking_space_id CHAR(36) NOT NULL,
+  business_holiday DATE NOT NULL,
+  is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (coworking_space_id) REFERENCES coworking_spaces(id) ON DELETE CASCADE,
+  UNIQUE KEY uniq_space_holiday (coworking_space_id, business_holiday)
+);
+
+INSERT INTO app_db.business_holidays (id, coworking_space_id, business_holiday) VALUES (UUID(), '5378bd7d-5417-11f0-a1cb-0242ac1b0002', '2025-06-12');
+
+CREATE TABLE app_db.meeting_rooms (
+  id CHAR(36) PRIMARY KEY,
+  coworking_space_id CHAR(36) NOT NULL,
+  name VARCHAR(30) NOT NULL,
+  is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (coworking_space_id) REFERENCES coworking_spaces(id) ON DELETE CASCADE,
+  UNIQUE KEY uniq_space_meeting (coworking_space_id, name)
+);
+
+INSERT INTO app_db.meeting_rooms (id, coworking_space_id, name) VALUES (UUID(), '5378bd7d-5417-11f0-a1cb-0242ac1b0002', '会議室A');
