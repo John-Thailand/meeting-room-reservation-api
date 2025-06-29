@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity('coworking_spaces')
 export class CoworkingSpace {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -8,12 +8,10 @@ export class CoworkingSpace {
   @Column({ type: 'text', nullable: false })
   name: string;
 
-  // TODO: MySQLの場合はtypeを'time'にしておく
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'time', nullable: false })
   open_time: string;
 
-  // TODO: MySQLの場合はtypeを'time'にしておく
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'time', nullable: false })
   close_time: string;
 
   @Column({ type: 'boolean', default: false, nullable: false })
