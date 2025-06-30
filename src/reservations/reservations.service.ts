@@ -40,6 +40,11 @@ export class ReservationsService {
       throw new BadRequestException('you must reserve the meeting room for this month')
     }
 
+    // 現在日時以降の予約か
+    if (startJst.toDate() <= nowJst.toDate() || endJst.toDate() <= nowJst.toDate()) {
+      throw new BadRequestException('you must make a reservation after now')
+    }
+
     // 開始日時 < 終了日時か
     if (dto.start_datetime >= dto.end_datetime) {
       throw new BadRequestException('end date must be later than start date')
