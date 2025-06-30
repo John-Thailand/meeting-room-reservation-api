@@ -8,6 +8,8 @@ import { CoworkingSpacesService } from 'src/coworking-spaces/coworking-spaces.se
 
 import * as moment from 'moment-timezone'
 import { BusinessHolidaysService } from 'src/business-holidays/business-holidays.service';
+import { SearchReservationsRequestDto } from './dtos/search-reservations-request.dto';
+import { SearchReservationsResponseDto } from './dtos/search-reservations-response.dto';
 
 @Injectable()
 export class ReservationsService {
@@ -274,5 +276,30 @@ export class ReservationsService {
 
     reservation.is_deleted = true
     this.repo.save(reservation)
+  }
+
+  async search(
+    dto: SearchReservationsRequestDto,
+  ): Promise<SearchReservationsResponseDto> {
+    let query = this.repo
+      .createQueryBuilder()
+      .where('is_deleted = :is_deleted', {
+        is_deleted: false
+      })
+      .andWhere('meeting_room_id = :meeting_room_id', {
+        meeting_room_id: dto.meeting_room_id
+      })
+      .andWhere('start_datetime BETWEEN :start_date AND :end_date', {
+        start_date: dto.start_date,
+        end_date: dto.end_date
+      })
+      .orderBy('start_datetime', 'ASC')
+
+    const reservations = await query.getMany()
+
+    return {
+      reservations,
+      total: reservations.length,
+    }
   }
 }
