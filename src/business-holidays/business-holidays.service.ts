@@ -24,13 +24,13 @@ export class BusinessHolidaysService {
 
     const query = this.repo
       .createQueryBuilder()
-      .andWhere('coworking_space_id = :coworking_space_id', {
+      .where('coworking_space_id = :coworking_space_id', {
         coworking_space_id: coworkingSpaceId
       })
       .andWhere('business_holiday = :business_holiday', {
         business_holiday: businessHoliday
       })
-      .where('is_deleted = :is_deleted', {
+      .andWhere('is_deleted = :is_deleted', {
         is_deleted: false
       })
 

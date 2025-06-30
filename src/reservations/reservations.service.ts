@@ -81,6 +81,18 @@ export class ReservationsService {
       throw new BadRequestException('reservation must be within coworking space business hours')
     }
 
+    // そのコワーキングスペースの休業日に会議室の予約をしていないか
+    const date = new Date(
+      dto.start_datetime.getFullYear(),
+      dto.start_datetime.getMonth(),
+      dto.start_datetime.getDate(),
+    )
+    const existingBusinessHoliday = await  this.businessHolidaysService.findOne(coworkingSpace.id, date)
+
+    if (existingBusinessHoliday) {
+      throw new BadRequestException('you can not reserve a meeting room on a holiday')
+    }
+
     // ユーザーは１ヶ月に6回分まで会議室の予約ができる
     const startOfThisMonth = nowJst.clone().startOf('month').startOf('day').utc().toDate()
     const endOfThisMonth = nowJst.clone().endOf('month').endOf('day').utc().toDate()
