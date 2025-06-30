@@ -10,6 +10,7 @@ import { SearchReservationsRequestDto } from './dtos/search-reservations-request
 import { SearchReservationsResponseDto } from './dtos/search-reservations-response.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { CreateReservationDto } from './dtos/create-reservation.dto';
+import { UpdateReservationDto } from './dtos/update-reservation.dto';
 
 @Controller()
 export class ReservationsController {
@@ -25,6 +26,20 @@ export class ReservationsController {
       body
     )
     return reservation
+  }
+
+  @Patch('reservations/:id')
+  @UseGuards(AdminGuard)
+  @Serialize(ReservationDto)
+  async updateReservation(
+    @Param('id') id: string,
+    @Body() body: UpdateReservationDto
+  ): Promise<Reservation> {
+    const myReservation = await this.reservationsService.updateReservation(
+      id,
+      body
+    )
+    return myReservation
   }
 
   @Delete('reservations/:id')
