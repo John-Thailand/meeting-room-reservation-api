@@ -145,6 +145,119 @@ export class ReservationsService {
     return this.repo.save(myReservation)
   }
 
+  async updateMyReservation(
+    id: string,
+    attrs: Partial<Reservation>,
+    userId: string,
+  ): Promise<Reservation> {
+    // その予約が存在しない場合はエラーを返す
+    const existingMyReservation = await this.repo.findOneBy({
+      id,
+      user_id: userId,
+      is_deleted: false,
+    })
+    if (!existingMyReservation) {
+      throw new BadRequestException('your reservation does not exist')
+    }
+
+    const meetingRoomId = attrs.meeting_room_id ?? existingMyReservation.meeting_room_id
+    const startDatetime = attrs.start_datetime ?? existingMyReservation.start_datetime
+    const endDatetime = attrs.end_datetime ?? existingMyReservation.end_datetime
+
+    // 会議室が存在しない場合はエラーを返す
+    const meetingRoom = await this.meetingRoomsService.findOne(meetingRoomId)
+    if (!meetingRoom) {
+      throw new NotFoundException('meeting room not found')
+    }
+
+    // 今月分の予約かどうか
+    const nowJst = moment().tz('Asia/Tokyo')
+
+    const startJst = moment(startDatetime).tz('Asia/Tokyo')
+    const endJst = moment(endDatetime).tz('Asia/Tokyo')
+
+    if (startJst.month() !== nowJst.month() || startJst.year() !== nowJst.year() ||
+        endJst.month() !== nowJst.month() || endJst.year() !== nowJst.year()
+    ) {
+      throw new BadRequestException('you must reserve the meeting room for this month')
+    }
+
+    // 現在日時以降の予約か
+    if (startJst.toDate() <= nowJst.toDate() || endJst.toDate() <= nowJst.toDate()) {
+      throw new BadRequestException('you must make a reservation after now')
+    }
+
+    // 開始日時 < 終了日時か
+    if (startDatetime >= endDatetime) {
+      throw new BadRequestException('end date must be later than start date')
+    }
+
+    // 予約時間が15・30・45・60分のいずれか
+    const diffInMilliSeconds = endDatetime.getTime() - startDatetime.getTime()
+    const diffInMinutes = diffInMilliSeconds / (1000 * 60)
+
+    if (![15, 30, 45, 60].includes(diffInMinutes)) {
+      throw new BadRequestException('reservation time must be 15, 30, 45 or 60 minutes')
+    }
+
+    // 会議室の開店時間〜閉店時間内の予約かどうかチェック
+    const coworkingSpace = await this.coworkingSpacesService.findOne(meetingRoom.coworking_space_id)
+    if (!coworkingSpace) {
+      throw new BadRequestException('coworking space not found')
+    }
+
+    const [openHour, openMinute] = coworkingSpace.open_time.split(':').map(Number)
+    const [closeHour, closeMinute] = coworkingSpace.close_time.split(':').map(Number)
+
+    const startHour = startJst.hour()
+    const startMinute = startJst.minute()
+    const endHour = endJst.hour()
+    const endMinute = endJst.minute()
+
+    const isStartInBusinessHours =
+      startHour > openHour || (startHour === openHour && startMinute >= openMinute)
+    const isEndInBusinessHours =
+      endHour < closeHour || (endHour === closeHour && endMinute <= closeMinute)
+
+    if (!isStartInBusinessHours || !isEndInBusinessHours) {
+      throw new BadRequestException('reservation must be within coworking space business hours')
+    }
+
+    // そのコワーキングスペースの休業日に会議室の予約をしていないか
+    const date = new Date(
+      startDatetime.getFullYear(),
+      startDatetime.getMonth(),
+      startDatetime.getDate(),
+    )
+    const existingBusinessHoliday = await  this.businessHolidaysService.findOne(coworkingSpace.id, date)
+
+    if (existingBusinessHoliday) {
+      throw new BadRequestException('you can not reserve a meeting room on a holiday')
+    }
+
+    // すでにその会議室でその時間で予約をしているかどうか
+    const overlapCount = await this.repo
+      .createQueryBuilder()
+      .where('is_deleted = :is_deleted', {
+        is_deleted: false
+      })
+      .andWhere('meeting_room_id = :meeting_room_id', {
+        meeting_room_id: meetingRoomId
+      })
+      .andWhere('start_datetime < :end_reservation_datetime AND end_datetime > :start_reservation_datetime ', {
+        start_reservation_datetime: startJst.toDate(),
+        end_reservation_datetime: endJst.toDate()
+      })
+      .getCount()
+
+    if (overlapCount > 0) {
+      throw new BadRequestException('the meeting room is already reserved for the datetime')
+    }
+
+    Object.assign(existingMyReservation, attrs)
+    return this.repo.save(existingMyReservation)
+  }
+
   async deleteMyReservation(
     userId: string,
     reservationId: string
