@@ -8,10 +8,34 @@ import { ReservationDto } from './dtos/reservation.dto';
 import { UpdateMyReservationDto } from './dtos/update-my-reservation.dto';
 import { SearchReservationsRequestDto } from './dtos/search-reservations-request.dto';
 import { SearchReservationsResponseDto } from './dtos/search-reservations-response.dto';
+import { AdminGuard } from 'src/guards/admin.guard';
+import { CreateReservationDto } from './dtos/create-reservation.dto';
 
 @Controller()
 export class ReservationsController {
   constructor(private reservationsService: ReservationsService) {}
+
+  @Post('reservations')
+  @UseGuards(AdminGuard)
+  @Serialize(ReservationDto)
+  async createReservation(
+    @Body() body: CreateReservationDto
+  ): Promise<Reservation> {
+    const reservation = await this.reservationsService.createReservation(
+      body
+    )
+    return reservation
+  }
+
+  @Delete('reservations/:id')
+  @UseGuards(AdminGuard)
+  @Serialize(ReservationDto)
+  @HttpCode(204)
+  async deleteReservation(
+    @Param('id') id: string
+  ): Promise<void> {
+    await this.reservationsService.deleteReservation(id)
+  }
 
   @Post('users/me/reservations')
   @UseGuards(AuthGuard)
