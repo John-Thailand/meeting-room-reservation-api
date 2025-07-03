@@ -11,12 +11,23 @@ import { MeetingRoomsModule } from './meeting-rooms/meeting-rooms.module';
 import { MeetingRoom } from "./meeting-rooms/meeting-room.entity";
 import { ReservationsModule } from './reservations/reservations.module';
 import { Reservation } from "./reservations/reservation.entity";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { APP_GUARD } from "@nestjs/core";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`
+    }),
+    // https://docs.nestjs.com/security/rate-limiting
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 30,
+        },
+      ],
     }),
     // TypeORMを使ってSQLiteデータベースに接続するための初期設定
     // TypeOrmModule.forRoot({
@@ -47,6 +58,11 @@ import { Reservation } from "./reservations/reservation.entity";
     ReservationsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
